@@ -1,0 +1,1 @@
+package com.householdfinance.finance.application.port.in;import com.householdfinance.finance.domain.*;import java.util.*;public interface AccountUseCase{FinancialAccount open(UUID u,HouseholdId h,String n,AccountType t,Money b);List<FinancialAccount> list(UUID u,HouseholdId h);}

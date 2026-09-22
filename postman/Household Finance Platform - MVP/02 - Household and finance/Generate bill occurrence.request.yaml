@@ -1,0 +1,13 @@
+$kind: http-request
+url: "{{finance_url}}/api/v1/households/{{household_id}}/bills/{{bill_id}}/occurrences"
+method: POST
+headers:
+  Authorization: Bearer {{access_token}}
+  Content-Type: application/json
+body:
+  type: text
+  content: '{ "dueDate": "2026-10-10" }'
+scripts:
+  - type: afterResponse
+    code: pm.environment.set('occurrence_id', pm.response.json().id);
+order: 15000

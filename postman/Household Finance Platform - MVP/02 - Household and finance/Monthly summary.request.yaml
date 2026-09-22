@@ -1,0 +1,9 @@
+$kind: http-request
+url: "{{finance_url}}/api/v1/households/{{household_id}}/reports/summary?from={{date_from}}&to={{date_to}}"
+method: GET
+headers:
+  Authorization: Bearer {{access_token}}
+queryParams:
+  from: "{{date_from}}"
+  to: "{{date_to}}"
+order: 18000

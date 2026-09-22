@@ -1,0 +1,9 @@
+$kind: http-request
+url: "{{identity_url}}/api/v1/auth/logout"
+method: POST
+headers:
+  Content-Type: application/json
+body:
+  type: text
+  content: '{ "refreshTokenId": "{{refresh_token_id}}" }'
+order: 6000

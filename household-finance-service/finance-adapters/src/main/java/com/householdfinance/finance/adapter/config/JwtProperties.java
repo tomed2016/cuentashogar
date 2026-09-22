@@ -1,0 +1,1 @@
+package com.householdfinance.finance.adapter.config;import org.springframework.boot.context.properties.ConfigurationProperties;@ConfigurationProperties("finance.security.jwt")public record JwtProperties(String secret,String issuer,String audience){}

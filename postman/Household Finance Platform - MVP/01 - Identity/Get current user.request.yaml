@@ -1,0 +1,6 @@
+$kind: http-request
+url: "{{identity_url}}/api/v1/users/me"
+method: GET
+headers:
+  Authorization: Bearer {{access_token}}
+order: 3000

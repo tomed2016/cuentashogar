@@ -1,0 +1,187 @@
+name: household-finance-platform
+
+# ==============================================================================
+# Household Finance Platform - Docker Compose (entorno de desarrollo local)
+# ==============================================================================
+# Levanta:
+#   - postgres                 (unica instancia, con una BD/usuario por servicio)
+#   - identity-service
+#   - household-finance-service
+#
+# web-bff y mobile-bff se incorporaran cuando su codigo este implementado.
+#
+# Perfiles opcionales:
+#   --profile admin-tools     -> levanta pgAdmin
+#   --profile observability   -> levanta Prometheus y Grafana
+#
+# Uso:
+#   cp .env.example .env
+#   docker compose up --build
+# ==============================================================================
+
+services:
+
+  postgres:
+    image: postgres:16-alpine
+    container_name: hfp-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_SUPERUSER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_SUPERUSER_PASSWORD:-changeme-postgres}
+      IDENTITY_DB_USER: ${IDENTITY_DB_USER:-identity_user}
+      IDENTITY_DB_PASSWORD: ${IDENTITY_DB_PASSWORD:-changeme-identity}
+      IDENTITY_DB_NAME: ${IDENTITY_DB_NAME:-identity_db}
+      FINANCE_DB_USER: ${FINANCE_DB_USER:-finance_user}
+      FINANCE_DB_PASSWORD: ${FINANCE_DB_PASSWORD:-changeme-finance}
+      FINANCE_DB_NAME: ${FINANCE_DB_NAME:-finance_db}
+    ports:
+      - "${POSTGRES_PORT:-5432}:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+      - ./docker/postgres-init:/docker-entrypoint-initdb.d:ro
+    networks:
+      - hfp-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_SUPERUSER:-postgres} -d postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    deploy:
+      resources:
+        limits:
+          cpus: "1.0"
+          memory: 512M
+
+  identity-service:
+    build:
+      context: .
+      dockerfile: identity-service/identity-bootstrap/Dockerfile
+    container_name: hfp-identity-service
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      # No se activa el perfil "docker" del servicio: ese perfil fija un nombre de
+      # base de datos distinto ("identity") al usado por el script de init-db
+      # ("identity_db"). Con el perfil por defecto, IDENTITY_DB_URL se respeta.
+      IDENTITY_DB_URL: jdbc:postgresql://postgres:5432/${IDENTITY_DB_NAME:-identity_db}
+      IDENTITY_DB_USER: ${IDENTITY_DB_USER:-identity_user}
+      IDENTITY_DB_PASSWORD: ${IDENTITY_DB_PASSWORD:-changeme-identity}
+      IDENTITY_JWT_SECRET: ${JWT_SECRET:?JWT_SECRET debe definirse en el archivo .env}
+      IDENTITY_JWT_ISSUER: ${JWT_ISSUER:-household-finance-platform}
+      IDENTITY_JWT_AUDIENCE: household-finance-clients
+      IDENTITY_JWT_ACCESS_TTL: PT${JWT_ACCESS_TOKEN_TTL_MINUTES:-15}M
+      IDENTITY_JWT_REFRESH_TTL: P${JWT_REFRESH_TOKEN_TTL_DAYS:-30}D
+      LOGGING_LEVEL_ROOT: ${LOG_LEVEL:-INFO}
+    ports:
+      - "${IDENTITY_SERVICE_PORT:-8081}:8081"
+    networks:
+      - hfp-network
+    healthcheck:
+      test: ["CMD", "wget", "-q", "-O-", "http://localhost:8081/actuator/health/liveness"]
+      interval: 15s
+      timeout: 5s
+      retries: 10
+      start_period: 40s
+    deploy:
+      resources:
+        limits:
+          cpus: "1.0"
+          memory: 512M
+
+  household-finance-service:
+    build:
+      context: .
+      dockerfile: household-finance-service/finance-bootstrap/Dockerfile
+    container_name: hfp-household-finance-service
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+      identity-service:
+        condition: service_healthy
+    environment:
+      FINANCE_PORT: 8082
+      FINANCE_DB_URL: jdbc:postgresql://postgres:5432/${FINANCE_DB_NAME:-finance_db}
+      FINANCE_DB_USER: ${FINANCE_DB_USER:-finance_user}
+      FINANCE_DB_PASSWORD: ${FINANCE_DB_PASSWORD:-changeme-finance}
+      FINANCE_JWT_SECRET: ${JWT_SECRET:?JWT_SECRET debe definirse en el archivo .env}
+      FINANCE_JWT_ISSUER: ${JWT_ISSUER:-household-finance-platform}
+      FINANCE_JWT_AUDIENCE: household-finance-clients
+      LOGGING_LEVEL_ROOT: ${LOG_LEVEL:-INFO}
+    ports:
+      - "${FINANCE_SERVICE_PORT:-8082}:8082"
+    networks:
+      - hfp-network
+    healthcheck:
+      test: ["CMD", "wget", "-q", "-O-", "http://localhost:8082/actuator/health/liveness"]
+      interval: 15s
+      timeout: 5s
+      retries: 10
+      start_period: 40s
+    deploy:
+      resources:
+        limits:
+          cpus: "1.0"
+          memory: 512M
+
+  # --- Herramientas administrativas (perfil opcional) ---
+  pgadmin:
+    image: dpage/pgadmin4:8
+    container_name: hfp-pgadmin
+    profiles: ["admin-tools"]
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL:-admin@example.com}
+      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD:-changeme-pgadmin}
+    ports:
+      - "${PGADMIN_PORT:-5050}:80"
+    networks:
+      - hfp-network
+    volumes:
+      - pgadmin-data:/var/lib/pgadmin
+
+  # --- Observabilidad (perfil opcional) ---
+  prometheus:
+    image: prom/prometheus:v2.55.1
+    container_name: hfp-prometheus
+    profiles: ["observability"]
+    restart: unless-stopped
+    volumes:
+      - ./docker/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheus-data:/prometheus
+    ports:
+      - "9090:9090"
+    networks:
+      - hfp-network
+
+  grafana:
+    image: grafana/grafana:11.3.1
+    container_name: hfp-grafana
+    profiles: ["observability"]
+    restart: unless-stopped
+    depends_on:
+      - prometheus
+    environment:
+      GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_ADMIN_PASSWORD:-changeme-grafana}
+    ports:
+      - "3001:3000"
+    volumes:
+      - grafana-data:/var/lib/grafana
+    networks:
+      - hfp-network
+
+networks:
+  hfp-network:
+    driver: bridge
+
+volumes:
+  postgres-data:
+  pgadmin-data:
+  prometheus-data:
+  grafana-data:

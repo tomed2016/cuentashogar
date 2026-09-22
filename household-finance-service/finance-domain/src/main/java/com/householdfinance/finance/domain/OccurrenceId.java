@@ -1,0 +1,1 @@
+package com.householdfinance.finance.domain; import java.util.UUID; public record OccurrenceId(UUID value){public OccurrenceId{Ids.req(value);}public static OccurrenceId newId(){return new OccurrenceId(UUID.randomUUID());}public String toString(){return value.toString();}}

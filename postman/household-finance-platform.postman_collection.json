@@ -1,0 +1,345 @@
+{
+  "info": {
+    "_postman_id": "7fbd5f13-1d90-4d8c-9de1-8f0eab7e4f01",
+    "name": "Household Finance Platform - MVP",
+    "description": "Flujo secuencial de prueba para identity-service y household-finance-service. Ejecutar las carpetas en orden.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "content_type", "value": "application/json" }
+  ],
+  "item": [
+    {
+      "name": "01 - Identity",
+      "item": [
+        {
+          "name": "Register user",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "pm.environment.set('email', 'mvp-' + pm.variables.replaceIn('{{$randomUUID}}') + '@example.com');"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('user registered', function () { pm.expect(pm.response.code).to.eql(201); });",
+                  "const body = pm.response.json();",
+                  "pm.environment.set('access_token', body.accessToken);",
+                  "pm.environment.set('refresh_token_id', body.refreshTokenId);",
+                  "pm.environment.set('refresh_token', body.refreshToken);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "{{content_type}}" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{email}}\",\n  \"password\": \"{{password}}\",\n  \"firstName\": \"Ana\",\n  \"lastName\": \"Gomez\"\n}"
+            },
+            "url": {
+              "raw": "{{identity_url}}/api/v1/auth/register",
+              "host": ["{{identity_url}}"],
+              "path": ["api", "v1", "auth", "register"]
+            }
+          }
+        },
+        {
+          "name": "Login",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('login succeeded', function () { pm.expect(pm.response.code).to.eql(200); });",
+                  "const body = pm.response.json();",
+                  "pm.environment.set('access_token', body.accessToken);",
+                  "pm.environment.set('refresh_token_id', body.refreshTokenId);",
+                  "pm.environment.set('refresh_token', body.refreshToken);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "{{content_type}}" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{email}}\",\n  \"password\": \"{{password}}\"\n}"
+            },
+            "url": "{{identity_url}}/api/v1/auth/login"
+          }
+        },
+        {
+          "name": "Get current user",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{access_token}}" }],
+            "url": "{{identity_url}}/api/v1/users/me"
+          }
+        },
+        {
+          "name": "Refresh access token",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('refresh succeeded', function () { pm.expect(pm.response.code).to.eql(200); });",
+                  "const body = pm.response.json();",
+                  "pm.environment.set('access_token', body.accessToken);",
+                  "pm.environment.set('refresh_token_id', body.refreshTokenId);",
+                  "pm.environment.set('refresh_token', body.refreshToken);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "{{content_type}}" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"refreshTokenId\": \"{{refresh_token_id}}\",\n  \"refreshToken\": \"{{refresh_token}}\"\n}"
+            },
+            "url": "{{identity_url}}/api/v1/auth/refresh"
+          }
+        }
+      ]
+    },
+    {
+      "name": "02 - Household and finance",
+      "item": [
+        {
+          "name": "Create household",
+          "event": [{ "listen": "test", "script": { "exec": [
+            "pm.test('household created', function () { pm.expect(pm.response.code).to.eql(201); });",
+            "pm.environment.set('household_id', pm.response.json().id);"
+          ] } }],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{access_token}}" },
+              { "key": "Content-Type", "value": "{{content_type}}" }
+            ],
+            "body": { "mode": "raw", "raw": "{ \"name\": \"Hogar Postman\" }" },
+            "url": "{{finance_url}}/api/v1/households"
+          }
+        },
+        {
+          "name": "Get household",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{access_token}}" }],
+            "url": "{{finance_url}}/api/v1/households/{{household_id}}"
+          }
+        },
+        {
+          "name": "Create category",
+          "event": [{ "listen": "test", "script": { "exec": [
+            "pm.test('category created', function () { pm.expect(pm.response.code).to.eql(201); });",
+            "pm.environment.set('category_id', pm.response.json().id);"
+          ] } }],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{access_token}}" },
+              { "key": "Content-Type", "value": "{{content_type}}" }
+            ],
+            "body": { "mode": "raw", "raw": "{ \"name\": \"Salario\" }" },
+            "url": "{{finance_url}}/api/v1/households/{{household_id}}/categories"
+          }
+        },
+        {
+          "name": "List categories",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{access_token}}" }],
+            "url": "{{finance_url}}/api/v1/households/{{household_id}}/categories"
+          }
+        },
+        {
+          "name": "Create primary account",
+          "event": [{ "listen": "test", "script": { "exec": [
+            "pm.test('account created', function () { pm.expect(pm.response.code).to.eql(201); });",
+            "pm.environment.set('account_id', pm.response.json().id);"
+          ] } }],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{access_token}}" },
+              { "key": "Content-Type", "value": "{{content_type}}" }
+            ],
+            "body": { "mode": "raw", "raw": "{ \"name\": \"Cuenta principal\", \"type\": \"BANK\", \"openingBalance\": { \"amount\": 0, \"currency\": \"USD\" } }" },
+            "url": "{{finance_url}}/api/v1/households/{{household_id}}/accounts"
+          }
+        },
+        {
+          "name": "Create savings account",
+          "event": [{ "listen": "test", "script": { "exec": [
+            "pm.test('second account created', function () { pm.expect(pm.response.code).to.eql(201); });",
+            "pm.environment.set('account_2_id', pm.response.json().id);"
+          ] } }],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{access_token}}" },
+              { "key": "Content-Type", "value": "{{content_type}}" }
+            ],
+            "body": { "mode": "raw", "raw": "{ \"name\": \"Cuenta ahorro\", \"type\": \"BANK\", \"openingBalance\": { \"amount\": 500, \"currency\": \"USD\" } }" },
+            "url": "{{finance_url}}/api/v1/households/{{household_id}}/accounts"
+          }
+        },
+        {
+          "name": "Register income",
+          "event": [{ "listen": "test", "script": { "exec": [
+            "pm.test('income registered', function () { pm.expect(pm.response.code).to.eql(201); });",
+            "pm.environment.set('transaction_id', pm.response.json().id);"
+          ] } }],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{access_token}}" },
+              { "key": "Content-Type", "value": "{{content_type}}" }
+            ],
+            "body": { "mode": "raw", "raw": "{ \"accountId\": \"{{account_id}}\", \"categoryId\": \"{{category_id}}\", \"type\": \"INCOME\", \"amount\": { \"amount\": 2500, \"currency\": \"USD\" }, \"description\": \"Ingreso mensual\" }" },
+            "url": "{{finance_url}}/api/v1/households/{{household_id}}/transactions"
+          }
+        },
+        {
+          "name": "Register expense",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{access_token}}" },
+              { "key": "Content-Type", "value": "{{content_type}}" }
+            ],
+            "body": { "mode": "raw", "raw": "{ \"accountId\": \"{{account_id}}\", \"type\": \"EXPENSE\", \"amount\": { \"amount\": 100, \"currency\": \"USD\" }, \"description\": \"Supermercado\" }" },
+            "url": "{{finance_url}}/api/v1/households/{{household_id}}/transactions"
+          }
+        },
+        {
+          "name": "Transfer between accounts",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{access_token}}" },
+              { "key": "Content-Type", "value": "{{content_type}}" }
+            ],
+            "body": { "mode": "raw", "raw": "{ \"fromAccountId\": \"{{account_id}}\", \"toAccountId\": \"{{account_2_id}}\", \"amount\": { \"amount\": 200, \"currency\": \"USD\" }, \"description\": \"Ahorro mensual\" }" },
+            "url": "{{finance_url}}/api/v1/households/{{household_id}}/transfers"
+          }
+        },
+        {
+          "name": "List accounts",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{access_token}}" }],
+            "url": "{{finance_url}}/api/v1/households/{{household_id}}/accounts"
+          }
+        },
+        {
+          "name": "List transactions",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{access_token}}" }],
+            "url": "{{finance_url}}/api/v1/households/{{household_id}}/transactions"
+          }
+        },
+        {
+          "name": "Create bill",
+          "event": [{ "listen": "test", "script": { "exec": [
+            "pm.test('bill created', function () { pm.expect(pm.response.code).to.eql(201); });",
+            "pm.environment.set('bill_id', pm.response.json().id);"
+          ] } }],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{access_token}}" },
+              { "key": "Content-Type", "value": "{{content_type}}" }
+            ],
+            "body": { "mode": "raw", "raw": "{ \"name\": \"Electricidad\", \"amount\": { \"amount\": 80, \"currency\": \"USD\" }, \"dueDate\": \"2026-10-10\" }" },
+            "url": "{{finance_url}}/api/v1/households/{{household_id}}/bills"
+          }
+        },
+        {
+          "name": "List bills",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{access_token}}" }],
+            "url": "{{finance_url}}/api/v1/households/{{household_id}}/bills"
+          }
+        },
+        {
+          "name": "Generate bill occurrence",
+          "event": [{ "listen": "test", "script": { "exec": [
+            "pm.test('occurrence created', function () { pm.expect(pm.response.code).to.eql(201); });",
+            "pm.environment.set('occurrence_id', pm.response.json().id);"
+          ] } }],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{access_token}}" },
+              { "key": "Content-Type", "value": "{{content_type}}" }
+            ],
+            "body": { "mode": "raw", "raw": "{ \"dueDate\": \"2026-10-10\" }" },
+            "url": "{{finance_url}}/api/v1/households/{{household_id}}/bills/{{bill_id}}/occurrences"
+          }
+        },
+        {
+          "name": "Pay bill occurrence",
+          "event": [{ "listen": "test", "script": { "exec": [
+            "pm.test('bill paid', function () { pm.expect(pm.response.code).to.eql(200); });",
+            "pm.test('payment transaction created', function () { pm.expect(pm.response.json().paidBy).to.be.a('string'); });"
+          ] } }],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{access_token}}" },
+              { "key": "Content-Type", "value": "{{content_type}}" }
+            ],
+            "body": { "mode": "raw", "raw": "{ \"accountId\": \"{{account_id}}\", \"description\": \"Pago de electricidad\" }" },
+            "url": "{{finance_url}}/api/v1/households/{{household_id}}/bill-occurrences/{{occurrence_id}}/payments"
+          }
+        },
+        {
+          "name": "Create budget",
+          "event": [{ "listen": "test", "script": { "exec": [
+            "pm.test('budget created', function () { pm.expect(pm.response.code).to.eql(201); });",
+            "pm.environment.set('budget_id', pm.response.json().id);"
+          ] } }],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{access_token}}" },
+              { "key": "Content-Type", "value": "{{content_type}}" }
+            ],
+            "body": { "mode": "raw", "raw": "{ \"categoryId\": \"{{category_id}}\", \"limit\": { \"amount\": 500, \"currency\": \"USD\" }, \"period\": \"MONTHLY\", \"startDate\": \"2026-10-01\", \"endDate\": \"2026-10-31\" }" },
+            "url": "{{finance_url}}/api/v1/households/{{household_id}}/budgets"
+          }
+        },
+        {
+          "name": "Monthly summary",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{access_token}}" }],
+            "url": {
+              "raw": "{{finance_url}}/api/v1/households/{{household_id}}/reports/summary?from={{date_from}}&to={{date_to}}",
+              "host": ["{{finance_url}}"],
+              "path": ["api", "v1", "households", "{{household_id}}", "reports", "summary"],
+              "query": [
+                { "key": "from", "value": "{{date_from}}" },
+                { "key": "to", "value": "{{date_to}}" }
+              ]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

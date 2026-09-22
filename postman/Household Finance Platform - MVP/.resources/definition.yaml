@@ -1,0 +1,5 @@
+$kind: collection
+description: Colección para probar todos los endpoints REST actualmente expuestos por identity-service y household-finance-service. Ejecutar en orden; los scripts guardan tokens e identificadores.
+variables:
+  identity_url: http://localhost:8081
+  finance_url: http://localhost:8082

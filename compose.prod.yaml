@@ -1,0 +1,137 @@
+name: household-finance-platform
+
+# ==============================================================================
+# Household Finance Platform - Docker Compose (referencia de produccion)
+# ==============================================================================
+# Diferencias respecto de compose.yaml (desarrollo):
+#   - Sin pgAdmin ni otras herramientas administrativas.
+#   - Sin valores por defecto para secretos: todas las variables sensibles son
+#     obligatorias (usar variables de entorno del orquestador o un secret manager).
+#   - Puertos de base de datos y de aplicacion no publicados salvo lo necesario.
+#   - Politica de reinicio "always".
+#   - Pensado como punto de partida; en un despliegue real se recomienda:
+#       * usar PostgreSQL administrado en lugar del contenedor postgres,
+#       * inyectar secretos desde un secret manager (no desde variables planas),
+#       * y desplegar cada servicio de forma independiente (Kubernetes, PaaS, etc).
+#
+# Uso:
+#   docker compose -f compose.prod.yaml up --build -d
+# ==============================================================================
+
+services:
+
+  postgres:
+    image: postgres:16-alpine
+    container_name: hfp-postgres
+    restart: always
+    environment:
+      POSTGRES_USER: ${POSTGRES_SUPERUSER:?POSTGRES_SUPERUSER es obligatorio}
+      POSTGRES_PASSWORD: ${POSTGRES_SUPERUSER_PASSWORD:?POSTGRES_SUPERUSER_PASSWORD es obligatorio}
+      IDENTITY_DB_USER: ${IDENTITY_DB_USER:?IDENTITY_DB_USER es obligatorio}
+      IDENTITY_DB_PASSWORD: ${IDENTITY_DB_PASSWORD:?IDENTITY_DB_PASSWORD es obligatorio}
+      IDENTITY_DB_NAME: ${IDENTITY_DB_NAME:?IDENTITY_DB_NAME es obligatorio}
+      FINANCE_DB_USER: ${FINANCE_DB_USER:?FINANCE_DB_USER es obligatorio}
+      FINANCE_DB_PASSWORD: ${FINANCE_DB_PASSWORD:?FINANCE_DB_PASSWORD es obligatorio}
+      FINANCE_DB_NAME: ${FINANCE_DB_NAME:?FINANCE_DB_NAME es obligatorio}
+    # No se publica el puerto 5432 al host: solo accesible dentro de la red interna.
+    expose:
+      - "5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+      - ./docker/postgres-init:/docker-entrypoint-initdb.d:ro
+    networks:
+      - hfp-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_SUPERUSER} -d postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    logging:
+      driver: ${LOG_DRIVER:-json-file}
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  identity-service:
+    build:
+      context: .
+      dockerfile: identity-service/identity-bootstrap/Dockerfile
+    container_name: hfp-identity-service
+    restart: always
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      IDENTITY_DB_URL: jdbc:postgresql://postgres:5432/${IDENTITY_DB_NAME:?IDENTITY_DB_NAME es obligatorio}
+      IDENTITY_DB_USER: ${IDENTITY_DB_USER:?IDENTITY_DB_USER es obligatorio}
+      IDENTITY_DB_PASSWORD: ${IDENTITY_DB_PASSWORD:?IDENTITY_DB_PASSWORD es obligatorio}
+      IDENTITY_DB_POOL_SIZE: ${IDENTITY_DB_POOL_SIZE:-10}
+      IDENTITY_JWT_SECRET: ${JWT_SECRET:?JWT_SECRET es obligatorio}
+      IDENTITY_JWT_ISSUER: ${JWT_ISSUER:?JWT_ISSUER es obligatorio}
+      IDENTITY_JWT_AUDIENCE: ${JWT_AUDIENCE:?JWT_AUDIENCE es obligatorio}
+      IDENTITY_JWT_ACCESS_TTL: PT${JWT_ACCESS_TOKEN_TTL_MINUTES:?JWT_ACCESS_TOKEN_TTL_MINUTES es obligatorio}M
+      IDENTITY_JWT_REFRESH_TTL: P${JWT_REFRESH_TOKEN_TTL_DAYS:?JWT_REFRESH_TOKEN_TTL_DAYS es obligatorio}D
+      LOGGING_LEVEL_ROOT: ${LOG_LEVEL:-WARN}
+    expose:
+      - "8081"
+    ports:
+      - "${IDENTITY_SERVICE_PORT:-8081}:8081"
+    networks:
+      - hfp-network
+    healthcheck:
+      test: ["CMD", "wget", "-q", "-O-", "http://localhost:8081/actuator/health/liveness"]
+      interval: 15s
+      timeout: 5s
+      retries: 10
+      start_period: 40s
+    logging:
+      driver: ${LOG_DRIVER:-json-file}
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  household-finance-service:
+    build:
+      context: .
+      dockerfile: household-finance-service/finance-bootstrap/Dockerfile
+    container_name: hfp-household-finance-service
+    restart: always
+    depends_on:
+      postgres:
+        condition: service_healthy
+      identity-service:
+        condition: service_healthy
+    environment:
+      FINANCE_PORT: 8082
+      FINANCE_DB_URL: jdbc:postgresql://postgres:5432/${FINANCE_DB_NAME:?FINANCE_DB_NAME es obligatorio}
+      FINANCE_DB_USER: ${FINANCE_DB_USER:?FINANCE_DB_USER es obligatorio}
+      FINANCE_DB_PASSWORD: ${FINANCE_DB_PASSWORD:?FINANCE_DB_PASSWORD es obligatorio}
+      FINANCE_JWT_SECRET: ${JWT_SECRET:?JWT_SECRET es obligatorio}
+      FINANCE_JWT_ISSUER: ${JWT_ISSUER:?JWT_ISSUER es obligatorio}
+      FINANCE_JWT_AUDIENCE: ${JWT_AUDIENCE:?JWT_AUDIENCE es obligatorio}
+      LOGGING_LEVEL_ROOT: ${LOG_LEVEL:-WARN}
+    expose:
+      - "8082"
+    ports:
+      - "${FINANCE_SERVICE_PORT:-8082}:8082"
+    networks:
+      - hfp-network
+    healthcheck:
+      test: ["CMD", "wget", "-q", "-O-", "http://localhost:8082/actuator/health/liveness"]
+      interval: 15s
+      timeout: 5s
+      retries: 10
+      start_period: 40s
+    logging:
+      driver: ${LOG_DRIVER:-json-file}
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+networks:
+  hfp-network:
+    driver: bridge
+
+volumes:
+  postgres-data:

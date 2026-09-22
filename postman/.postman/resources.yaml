@@ -1,0 +1,10 @@
+# Use this workspace to collaborate
+workspace:
+  id: a7e777f6-9fe7-4086-8791-6318c60984aa
+
+localResources:
+  collections:
+    - ../Household Finance Platform - MVP
+  environments:
+    - ../household-finance-platform.postman_environment.json
+    - ../Household Finance - Local.environment.yaml

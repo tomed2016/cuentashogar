@@ -1,0 +1,10 @@
+$kind: http-request
+url: "{{finance_url}}/api/v1/households/{{household_id}}/bill-occurrences/{{occurrence_id}}/payments"
+method: POST
+headers:
+  Authorization: Bearer {{access_token}}
+  Content-Type: application/json
+body:
+  type: text
+  content: '{ "transactionId": "{{transaction_id}}" }'
+order: 16000

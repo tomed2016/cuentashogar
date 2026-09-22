@@ -1,0 +1,10 @@
+$kind: http-request
+url: "{{finance_url}}/api/v1/households/{{household_id}}/transfers"
+method: POST
+headers:
+  Authorization: Bearer {{access_token}}
+  Content-Type: application/json
+body:
+  type: text
+  content: '{ "fromAccountId": "{{account_id}}", "toAccountId": "{{account_2_id}}", "amount": { "amount": 200, "currency": "USD" }, "description": "Ahorro mensual" }'
+order: 10000

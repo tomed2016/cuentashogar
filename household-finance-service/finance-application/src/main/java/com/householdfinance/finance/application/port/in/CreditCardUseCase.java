@@ -1,0 +1,1 @@
+package com.householdfinance.finance.application.port.in;import com.householdfinance.finance.domain.*;import java.util.*;public interface CreditCardUseCase{CreditCard issue(UUID u,HouseholdId h,String n,Money l);List<CreditCard> list(UUID u,HouseholdId h);}

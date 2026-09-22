@@ -1,0 +1,1 @@
+package com.householdfinance.finance.application.port.in;import com.householdfinance.finance.domain.*;import java.time.*;import java.util.*;public interface ReportUseCase{record Report(Money income,Money expense,Money balance,long count){}Report summary(UUID u,HouseholdId h,LocalDate f,LocalDate t);}

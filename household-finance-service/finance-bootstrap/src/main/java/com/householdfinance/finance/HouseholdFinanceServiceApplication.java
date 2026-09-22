@@ -1,0 +1,1 @@
+package com.householdfinance.finance;import org.springframework.boot.*;import org.springframework.boot.autoconfigure.*;@SpringBootApplication public class HouseholdFinanceServiceApplication{public static void main(String[]a){SpringApplication.run(HouseholdFinanceServiceApplication.class,a);}}

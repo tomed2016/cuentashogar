@@ -1,0 +1,1 @@
+package com.householdfinance.finance.domain; import java.util.UUID; public record TransactionId(UUID value){public TransactionId{Ids.req(value);}public static TransactionId newId(){return new TransactionId(UUID.randomUUID());}public static TransactionId of(String v){return new TransactionId(UUID.fromString(v));}public String toString(){return value.toString();}}

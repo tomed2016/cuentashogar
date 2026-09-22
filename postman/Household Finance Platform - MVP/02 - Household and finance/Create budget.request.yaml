@@ -1,0 +1,11 @@
+$kind: http-request
+description: ""
+url: "{{finance_url}}/api/v1/households/{{household_id}}/budgets"
+method: POST
+headers:
+  Authorization: Bearer {{access_token}}
+  Content-Type: application/json
+body:
+  type: text
+  content: '{ "categoryId": "{{category_id}}", "limit": { "amount": 500, "currency": "USD" }, "period": "MONTHLY", "startDate": "2026-10-01", "endDate": "2026-10-31" }'
+order: 17000

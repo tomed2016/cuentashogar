@@ -1,0 +1,14 @@
+server.port: ${FINANCE_PORT:8082}
+spring.application.name: household-finance-service
+spring.datasource.url: ${FINANCE_DB_URL:jdbc:postgresql://localhost:5432/finance}
+spring.datasource.username: ${FINANCE_DB_USER:finance_service}
+spring.datasource.password: ${FINANCE_DB_PASSWORD:finance_service}
+spring.jpa.hibernate.ddl-auto: validate
+spring.jpa.open-in-view: false
+spring.flyway.enabled: true
+finance.security.jwt.secret: ${FINANCE_JWT_SECRET:change-me-to-a-long-random-secret-of-at-least-32-bytes}
+finance.security.jwt.issuer: ${FINANCE_JWT_ISSUER:household-finance-platform}
+finance.security.jwt.audience: ${FINANCE_JWT_AUDIENCE:household-finance-clients}
+management.endpoints.web.exposure.include: health,info,prometheus
+management.endpoint.health.probes.enabled: true
+springdoc.swagger-ui.path: /swagger-ui.html

@@ -1,0 +1,1 @@
+package com.householdfinance.finance.domain;public record Category(CategoryId id,HouseholdId householdId,String name,boolean active){public static Category create(HouseholdId h,String n){if(n==null||n.isBlank())throw new DomainException("Category name is required");return new Category(CategoryId.newId(),h,n.trim(),true);}}

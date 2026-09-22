@@ -1,0 +1,10 @@
+$kind: http-request
+url: "{{finance_url}}/api/v1/households/{{household_id}}/transactions"
+method: POST
+headers:
+  Authorization: Bearer {{access_token}}
+  Content-Type: application/json
+body:
+  type: text
+  content: '{ "accountId": "{{account_id}}", "type": "EXPENSE", "amount": { "amount": 100, "currency": "USD" }, "description": "Supermercado" }'
+order: 9000

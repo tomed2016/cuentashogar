@@ -1,0 +1,40 @@
+name: Household Finance - Local
+values:
+  - key: identity_url
+    value: 'http://localhost:8081'
+  - key: finance_url
+    value: 'http://localhost:8082'
+  - key: email
+    value: ''
+  - key: password
+    value: Password123!
+  - key: new_password
+    value: Password456!
+  - key: access_token
+    value: ''
+  - key: refresh_token_id
+    value: ''
+  - key: refresh_token
+    value: ''
+  - key: user_id
+    value: ''
+  - key: household_id
+    value: ''
+  - key: account_id
+    value: ''
+  - key: account_2_id
+    value: ''
+  - key: category_id
+    value: ''
+  - key: transaction_id
+    value: ''
+  - key: bill_id
+    value: ''
+  - key: occurrence_id
+    value: ''
+  - key: budget_id
+    value: ''
+  - key: date_from
+    value: '2026-01-01'
+  - key: date_to
+    value: '2026-12-31'

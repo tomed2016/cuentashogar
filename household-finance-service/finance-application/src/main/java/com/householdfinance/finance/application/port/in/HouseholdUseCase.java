@@ -1,0 +1,1 @@
+package com.householdfinance.finance.application.port.in;import com.householdfinance.finance.domain.*;import java.util.*;public interface HouseholdUseCase{Household create(UUID u,String n);Household get(UUID u,HouseholdId h);void rename(UUID u,HouseholdId h,String n);void addMember(UUID u,HouseholdId h,UUID m,MemberRole r);void removeMember(UUID u,HouseholdId h,UUID m);}

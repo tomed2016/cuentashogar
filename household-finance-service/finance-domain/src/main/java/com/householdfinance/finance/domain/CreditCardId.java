@@ -1,0 +1,1 @@
+package com.householdfinance.finance.domain; import java.util.UUID; public record CreditCardId(UUID value){public CreditCardId{Ids.req(value);}public static CreditCardId newId(){return new CreditCardId(UUID.randomUUID());}public String toString(){return value.toString();}}

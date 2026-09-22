@@ -1,0 +1,1 @@
+package com.householdfinance.finance.domain; import java.util.UUID; public record BillId(UUID value){public BillId{Ids.req(value);}public static BillId newId(){return new BillId(UUID.randomUUID());}public String toString(){return value.toString();}}

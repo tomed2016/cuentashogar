@@ -1,0 +1,13 @@
+$kind: http-request
+url: "{{finance_url}}/api/v1/households/{{household_id}}/bills"
+method: POST
+headers:
+  Authorization: Bearer {{access_token}}
+  Content-Type: application/json
+body:
+  type: text
+  content: '{ "name": "Electricidad", "amount": { "amount": 80, "currency": "USD" }, "dueDate": "2026-10-10" }'
+scripts:
+  - type: afterResponse
+    code: pm.environment.set('bill_id', pm.response.json().id);
+order: 13000

@@ -1,0 +1,1 @@
+package com.householdfinance.finance.application.port.in;import com.householdfinance.finance.domain.*;import java.time.*;import java.util.*;public interface BudgetUseCase{Budget create(UUID u,HouseholdId h,CategoryId c,Money l,BudgetPeriod p,LocalDate s,LocalDate e);List<Budget> list(UUID u,HouseholdId h);}

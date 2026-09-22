@@ -1,0 +1,13 @@
+create table households(id uuid primary key,name varchar(120) not null,created_at timestamptz default now(),updated_at timestamptz default now());
+create table household_members(household_id uuid references households(id),user_id uuid not null,role varchar(20) not null,status varchar(20) not null default 'ACTIVE',primary key(household_id,user_id));
+create index ix_member_user on household_members(user_id);
+create table financial_accounts(id uuid primary key,household_id uuid references households(id),name varchar(120) not null,type varchar(30),currency varchar(3),balance numeric(19,4) not null default 0,active boolean not null default true,version bigint not null default 0);
+create index ix_account_household on financial_accounts(household_id);
+create table credit_cards(id uuid primary key,household_id uuid references households(id),name varchar(120),currency varchar(3),credit_limit numeric(19,4) check(credit_limit>0),outstanding numeric(19,4) default 0,billing_day integer not null default 1 check(billing_day between 1 and 28),active boolean default true);
+create table categories(id uuid primary key,household_id uuid references households(id),name varchar(100) not null,active boolean default true,unique(household_id,name));
+create table financial_transactions(id uuid primary key,household_id uuid references households(id),account_id uuid references financial_accounts(id),destination_account_id uuid references financial_accounts(id),category_id uuid references categories(id),type varchar(20),amount numeric(19,4) check(amount>0),currency varchar(3),occurred_at timestamptz,description varchar(500),reversed boolean default false,reversal_of uuid references financial_transactions(id));
+create index ix_tx_household_date on financial_transactions(household_id,occurred_at);
+create table household_bills(id uuid primary key,household_id uuid references households(id),name varchar(160),amount numeric(19,4) check(amount>0),currency varchar(3),due_date date,status varchar(20) default 'ACTIVE');
+create table bill_occurrences(id uuid primary key,bill_id uuid references household_bills(id),due_date date,status varchar(20) default 'PENDING',paid_by uuid references financial_transactions(id),unique(bill_id,due_date));
+create table budgets(id uuid primary key,household_id uuid references households(id),category_id uuid references categories(id),limit_amount numeric(19,4) check(limit_amount>0),consumed_amount numeric(19,4) default 0,currency varchar(3),period varchar(20),start_date date,end_date date,check(end_date>=start_date));
+create index ix_budget_period on budgets(household_id,start_date,end_date);

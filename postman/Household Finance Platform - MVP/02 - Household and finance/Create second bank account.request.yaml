@@ -1,0 +1,13 @@
+$kind: http-request
+url: "{{finance_url}}/api/v1/households/{{household_id}}/accounts"
+method: POST
+headers:
+  Authorization: Bearer {{access_token}}
+  Content-Type: application/json
+body:
+  type: text
+  content: '{ "name": "Cuenta ahorro", "type": "BANK", "openingBalance": { "amount": 500, "currency": "USD" } }'
+scripts:
+  - type: afterResponse
+    code: pm.environment.set('account_2_id', pm.response.json().id);
+order: 6000

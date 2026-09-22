@@ -1,0 +1,17 @@
+$kind: http-request
+url: "{{identity_url}}/api/v1/auth/login"
+method: POST
+headers:
+  Content-Type: application/json
+body:
+  type: text
+  content: '{ "email": "{{email}}", "password": "{{password}}" }'
+scripts:
+  - type: afterResponse
+    code: |-
+      const body = pm.response.json();
+      pm.environment.set('access_token', body.accessToken);
+      pm.environment.set('refresh_token_id', body.refreshTokenId);
+      pm.environment.set('refresh_token', body.refreshToken);
+      pm.test('login succeeded', () => pm.expect(pm.response.code).to.eql(200));
+order: 2000
