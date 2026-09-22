@@ -118,9 +118,10 @@ public class FinanceController {
 
     @PostMapping("/households/{id}/bill-occurrences/{occurrenceId}/payments")
     OccurrenceResponse payOccurrence(Authentication authentication, @PathVariable UUID occurrenceId,
+                                     @RequestHeader("Idempotency-Key") String idempotencyKey,
                                      @Valid @RequestBody PaymentRequest request) {
         return occurrence(bills.pay(user(authentication), new OccurrenceId(occurrenceId),
-                new AccountId(request.accountId()), request.description()));
+                new AccountId(request.accountId()), request.description(), idempotencyKey));
     }
 
     @PostMapping("/households/{id}/budgets")

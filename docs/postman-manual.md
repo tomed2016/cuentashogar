@@ -150,7 +150,9 @@ activo de Postman.
 El pago de un vencimiento no requiere un movimiento ni un `transaction_id`
 preexistente. La petición utiliza `account_id`; el servicio toma el importe de la factura,
 crea el movimiento `BILL_PAYMENT`, actualiza el saldo y marca el vencimiento
-como pagado en una única transacción.
+como pagado en una única transacción. También envía `payment_idempotency_key`
+mediante el header `Idempotency-Key`; si la respuesta original se pierde,
+repetir la misma petición devuelve el resultado persistido sin duplicar el débito.
 
 ## Reiniciar las pruebas
 

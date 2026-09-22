@@ -155,6 +155,10 @@ El cuerpo de pago de un vencimiento es:
 }
 ```
 
+La petición debe incluir `Idempotency-Key`. La clave es única por usuario y
+operación; repetirla con el mismo contenido devuelve el vencimiento ya pagado,
+mientras que reutilizarla con contenido diferente es rechazado.
+
 La respuesta contiene `paidBy`, que identifica el movimiento
 `BILL_PAYMENT` creado por el servicio.
 
@@ -205,8 +209,11 @@ creado queda asociado al vencimiento en `paidBy`.
 
 Los vencimientos se guardan con una restricción única por factura y fecha, y el
 adaptador reconstruye sus identificadores y estados (`PENDING`, `PAID`,
-`CANCELLED` u `OVERDUE`) desde PostgreSQL. La idempotencia persistente mediante
-`Idempotency-Key`, el outbox y los pagos parciales siguen pendientes.
+`CANCELLED` u `OVERDUE`) desde PostgreSQL. La idempotencia persistente está
+implementada para pagos de vencimientos: la tabla `idempotency_keys` conserva
+la clave, el hash de la solicitud, su estado y el recurso generado.
+Transferencias y otros movimientos todavía no utilizan esta protección; el
+outbox y los pagos parciales siguen pendientes.
 
 ## Seguridad y observabilidad
 

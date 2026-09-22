@@ -7,7 +7,4 @@ headers:
 body:
   type: text
   content: '{ "accountId": "{{account_id}}", "categoryId": "{{category_id}}", "type": "INCOME", "amount": { "amount": 2500, "currency": "USD" }, "description": "Ingreso mensual" }'
-scripts:
-  - type: afterResponse
-    code: pm.environment.set('transaction_id', pm.response.json().id);
 order: 8000

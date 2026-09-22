@@ -102,6 +102,10 @@ hogar mediante una operación financiera atómica.
 3. `POST /api/v1/households/{householdId}/bills/{billId}/occurrences`
 4. `POST /api/v1/households/{householdId}/bill-occurrences/{occurrenceId}/payments`
 
+El pago requiere el header `Idempotency-Key`. La petición de generación del
+vencimiento de la colección crea automáticamente una clave nueva y la guarda
+en `payment_idempotency_key`.
+
 ### Cuerpo del pago
 
 ```json
@@ -119,6 +123,9 @@ hogar mediante una operación financiera atómica.
 - Se crea un movimiento de tipo `BILL_PAYMENT`.
 - El saldo de `account_id` disminuye exactamente por el importe de la factura.
 - `paidBy` contiene el identificador del movimiento creado.
+- Repetir la misma petición con la misma clave devuelve el mismo vencimiento y
+  no crea otro movimiento ni vuelve a descontar el saldo.
+- Reutilizar la clave con otro vencimiento, cuenta o descripción es rechazado.
 - Un segundo intento sobre el mismo vencimiento falla y no descuenta nuevamente
   el saldo.
 - Una cuenta inexistente, de otro hogar, con otra moneda o sin saldo suficiente

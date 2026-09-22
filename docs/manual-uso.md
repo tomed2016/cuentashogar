@@ -186,7 +186,10 @@ máquina con acceso directo al API del daemon.
 - El endpoint de pago de vencimientos recibe `accountId`, crea un movimiento
   `BILL_PAYMENT`, descuenta la cuenta y marca el vencimiento como pagado en
   una única transacción. Un pago repetido es rechazado.
-- No hay todavía idempotencia persistente mediante `Idempotency-Key`.
+- Los pagos de vencimientos requieren `Idempotency-Key` y repiten el resultado
+  sin duplicar el débito cuando se reutiliza la misma clave con la misma
+  solicitud. Transferencias y otros movimientos todavía no tienen esta
+  protección.
 - Los BFF web y mobile todavía no forman parte del proyecto ejecutable.
 - Las consultas avanzadas de facturas próximas/vencidas y el consumo completo
   de presupuestos aún están pendientes.
