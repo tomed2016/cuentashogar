@@ -188,8 +188,8 @@ máquina con acceso directo al API del daemon.
   una única transacción. Un pago repetido es rechazado.
 - Los pagos de vencimientos requieren `Idempotency-Key` y repiten el resultado
   sin duplicar el débito cuando se reutiliza la misma clave con la misma
-  solicitud. Transferencias y otros movimientos todavía no tienen esta
-  protección.
+  solicitud. Ingresos, gastos y transferencias también requieren esa cabecera
+  y reproducen el movimiento original sin duplicarlo.
 - Los BFF web y mobile todavía no forman parte del proyecto ejecutable.
 - Las consultas avanzadas de facturas próximas/vencidas y el consumo completo
   de presupuestos aún están pendientes.

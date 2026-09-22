@@ -54,6 +54,9 @@ final class IdempotentBillService implements BillUseCase {
             return finance.occurrence(new OccurrenceId(record.resourceId()))
                     .orElseThrow(() -> new DomainException("Idempotent payment result not found"));
         }
+        if (record.status() == IdempotencyRepository.IdempotencyRecord.Status.PROCESSING) {
+            throw new DomainException("Idempotent payment is already in progress");
+        }
 
         var paid = delegate.pay(userId, occurrenceId, accountId, description);
         idempotency.complete(record.id(), paid.id().value());

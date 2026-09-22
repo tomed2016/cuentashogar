@@ -203,8 +203,9 @@
           "request": {
             "method": "POST",
             "header": [
-              { "key": "Authorization", "value": "Bearer {{access_token}}" },
-              { "key": "Content-Type", "value": "{{content_type}}" }
+              { "key": "Authorization", "value": "******" },
+              { "key": "Content-Type", "value": "{{content_type}}" },
+              { "key": "Idempotency-Key", "value": "income-{{$guid}}" }
             ],
             "body": { "mode": "raw", "raw": "{ \"accountId\": \"{{account_id}}\", \"categoryId\": \"{{category_id}}\", \"type\": \"INCOME\", \"amount\": { \"amount\": 2500, \"currency\": \"USD\" }, \"description\": \"Ingreso mensual\" }" },
             "url": "{{finance_url}}/api/v1/households/{{household_id}}/transactions"
@@ -215,8 +216,9 @@
           "request": {
             "method": "POST",
             "header": [
-              { "key": "Authorization", "value": "Bearer {{access_token}}" },
-              { "key": "Content-Type", "value": "{{content_type}}" }
+              { "key": "Authorization", "value": "******" },
+              { "key": "Content-Type", "value": "{{content_type}}" },
+              { "key": "Idempotency-Key", "value": "expense-{{$guid}}" }
             ],
             "body": { "mode": "raw", "raw": "{ \"accountId\": \"{{account_id}}\", \"type\": \"EXPENSE\", \"amount\": { \"amount\": 100, \"currency\": \"USD\" }, \"description\": \"Supermercado\" }" },
             "url": "{{finance_url}}/api/v1/households/{{household_id}}/transactions"
@@ -227,8 +229,9 @@
           "request": {
             "method": "POST",
             "header": [
-              { "key": "Authorization", "value": "Bearer {{access_token}}" },
-              { "key": "Content-Type", "value": "{{content_type}}" }
+              { "key": "Authorization", "value": "******" },
+              { "key": "Content-Type", "value": "{{content_type}}" },
+              { "key": "Idempotency-Key", "value": "transfer-{{$guid}}" }
             ],
             "body": { "mode": "raw", "raw": "{ \"fromAccountId\": \"{{account_id}}\", \"toAccountId\": \"{{account_2_id}}\", \"amount\": { \"amount\": 200, \"currency\": \"USD\" }, \"description\": \"Ahorro mensual\" }" },
             "url": "{{finance_url}}/api/v1/households/{{household_id}}/transfers"

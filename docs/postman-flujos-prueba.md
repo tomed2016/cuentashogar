@@ -126,6 +126,10 @@ en `payment_idempotency_key`.
 - Repetir la misma petición con la misma clave devuelve el mismo vencimiento y
   no crea otro movimiento ni vuelve a descontar el saldo.
 - Reutilizar la clave con otro vencimiento, cuenta o descripción es rechazado.
+
+Los endpoints de ingresos, gastos y transferencias también requieren
+`Idempotency-Key`. La colección genera claves independientes con los prefijos
+`income-`, `expense-` y `transfer-`.
 - Un segundo intento sobre el mismo vencimiento falla y no descuenta nuevamente
   el saldo.
 - Una cuenta inexistente, de otro hogar, con otra moneda o sin saldo suficiente

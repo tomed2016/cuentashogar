@@ -154,6 +154,11 @@ como pagado en una única transacción. También envía `payment_idempotency_key
 mediante el header `Idempotency-Key`; si la respuesta original se pierde,
 repetir la misma petición devuelve el resultado persistido sin duplicar el débito.
 
+Las peticiones `Register income`, `Register expense` y `Transfer between
+accounts` también incluyen una clave idempotente generada automáticamente.
+Conserve la misma clave para reintentar una solicitud y no la reutilice con un
+importe, cuenta o descripción diferente.
+
 ## Reiniciar las pruebas
 
 Para detener los servicios sin eliminar datos:

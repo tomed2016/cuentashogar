@@ -20,10 +20,10 @@ public class IdempotencyRepositoryAdapter implements IdempotencyRepository {
     public IdempotencyRecord reserve(UUID userId, String operation, String key, String requestHash) {
         var id = UUID.randomUUID();
         var now = Instant.now();
-        repository.insertIfAbsent(id, userId, operation, key, requestHash, now);
-        var entity = repository.findByUserIdAndOperationAndIdempotencyKey(userId, operation, key)
+        var inserted = repository.insertIfAbsent(id, userId, operation, key, requestHash, now) > 0;
+        var entity = repository.findLocked(userId, operation, key)
                 .orElseThrow(() -> new IllegalStateException("Idempotency record was not created"));
-        return toDomain(entity);
+        return toDomain(entity, inserted);
     }
 
     @Override
@@ -37,8 +37,14 @@ public class IdempotencyRepositoryAdapter implements IdempotencyRepository {
     }
 
     private IdempotencyRecord toDomain(IdempotencyKeyEntity entity) {
+        return toDomain(entity, false);
+    }
+
+    private IdempotencyRecord toDomain(IdempotencyKeyEntity entity, boolean newlyReserved) {
         return new IdempotencyRecord(entity.id, entity.userId, entity.operation,
                 entity.idempotencyKey, entity.requestHash,
-                IdempotencyRecord.Status.valueOf(entity.status), entity.resourceId, entity.createdAt);
+                newlyReserved ? IdempotencyRecord.Status.RESERVED
+                        : IdempotencyRecord.Status.valueOf(entity.status),
+                entity.resourceId, entity.createdAt);
     }
 }

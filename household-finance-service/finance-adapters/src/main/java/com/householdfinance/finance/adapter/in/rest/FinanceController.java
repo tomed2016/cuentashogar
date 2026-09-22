@@ -73,11 +73,12 @@ public class FinanceController {
 
     @PostMapping("/households/{id}/transactions")
     ResponseEntity<TransactionResponse> createTransaction(Authentication authentication, @PathVariable UUID id,
+                                                           @RequestHeader("Idempotency-Key") String idempotencyKey,
                                                            @Valid @RequestBody TransactionRequest request) {
         var transaction = transactions.record(user(authentication), new HouseholdId(id),
                 new AccountId(request.accountId()), request.categoryId(),
                 TransactionType.valueOf(request.type().toUpperCase()), request.amount().domain(),
-                Instant.now(), request.description());
+                Instant.now(), request.description(), idempotencyKey);
         return ResponseEntity.status(201).body(transaction(transaction));
     }
 
@@ -89,10 +90,11 @@ public class FinanceController {
 
     @PostMapping("/households/{id}/transfers")
     ResponseEntity<TransactionResponse> transfer(Authentication authentication, @PathVariable UUID id,
+                                                  @RequestHeader("Idempotency-Key") String idempotencyKey,
                                                   @Valid @RequestBody TransferRequest request) {
         var transaction = transactions.transfer(user(authentication), new HouseholdId(id),
                 new AccountId(request.fromAccountId()), new AccountId(request.toAccountId()),
-                request.amount().domain(), Instant.now(), request.description());
+                request.amount().domain(), Instant.now(), request.description(), idempotencyKey);
         return ResponseEntity.status(201).body(transaction(transaction));
     }
 

@@ -212,8 +212,8 @@ adaptador reconstruye sus identificadores y estados (`PENDING`, `PAID`,
 `CANCELLED` u `OVERDUE`) desde PostgreSQL. La idempotencia persistente está
 implementada para pagos de vencimientos: la tabla `idempotency_keys` conserva
 la clave, el hash de la solicitud, su estado y el recurso generado.
-Transferencias y otros movimientos todavía no utilizan esta protección; el
-outbox y los pagos parciales siguen pendientes.
+Ingresos, gastos y transferencias también utilizan claves idempotentes
+persistentes. El outbox y los pagos parciales siguen pendientes.
 
 ## Seguridad y observabilidad
 
