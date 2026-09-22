@@ -12,7 +12,7 @@ está en [`manual-uso.md`](manual-uso.md).
 3. Seleccionar el entorno **Household Finance - Local**.
 4. Ejecutar las carpetas en orden: `01 - Identity` y luego `02 - Household and finance`.
 
-Los scripts de Postman guardan automáticamente `access_token`, `refresh_token`, `household_id`, `account_id`, `category_id`, `transaction_id`, `bill_id` y `occurrence_id`.
+Los scripts de Postman guardan automáticamente `access_token`, `refresh_token`, `household_id`, `account_id`, `category_id`, `bill_id` y `occurrence_id`.
 
 ## Datos generados
 

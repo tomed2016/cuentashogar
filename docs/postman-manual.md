@@ -68,7 +68,6 @@ household_id
 account_id
 account_2_id
 category_id
-transaction_id
 bill_id
 occurrence_id
 budget_id
@@ -148,8 +147,8 @@ household_id
 Los UUID se pueden consultar en las respuestas anteriores o en el entorno
 activo de Postman.
 
-El pago de un vencimiento no requiere un `transaction_id` preexistente. La
-petición utiliza `account_id`; el servicio toma el importe de la factura,
+El pago de un vencimiento no requiere un movimiento ni un `transaction_id`
+preexistente. La petición utiliza `account_id`; el servicio toma el importe de la factura,
 crea el movimiento `BILL_PAYMENT`, actualiza el saldo y marca el vencimiento
 como pagado en una única transacción.
 

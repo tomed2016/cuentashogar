@@ -100,7 +100,7 @@ En Postman:
 La petición **Register user** genera un correo único con UUID. La contraseña de
 prueba es `Password123!`. Los scripts guardan automáticamente:
 `access_token`, `refresh_token_id`, `refresh_token`, `household_id`,
-`account_id`, `account_2_id`, `category_id`, `transaction_id`, `bill_id`,
+`account_id`, `account_2_id`, `category_id`, `bill_id`,
 `occurrence_id` y `budget_id`.
 
 Las peticiones financieras usan automáticamente:

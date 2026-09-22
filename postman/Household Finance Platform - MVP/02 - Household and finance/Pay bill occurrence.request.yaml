@@ -6,5 +6,5 @@ headers:
   Content-Type: application/json
 body:
   type: text
-  content: '{ "transactionId": "{{transaction_id}}" }'
+  content: '{ "accountId": "{{account_id}}", "description": "Pago de electricidad" }'
 order: 16000

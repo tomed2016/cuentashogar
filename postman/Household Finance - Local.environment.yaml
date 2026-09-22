@@ -26,8 +26,6 @@ values:
     value: ''
   - key: category_id
     value: ''
-  - key: transaction_id
-    value: ''
   - key: bill_id
     value: ''
   - key: occurrence_id

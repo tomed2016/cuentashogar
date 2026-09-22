@@ -198,8 +198,7 @@
         {
           "name": "Register income",
           "event": [{ "listen": "test", "script": { "exec": [
-            "pm.test('income registered', function () { pm.expect(pm.response.code).to.eql(201); });",
-            "pm.environment.set('transaction_id', pm.response.json().id);"
+            "pm.test('income registered', function () { pm.expect(pm.response.code).to.eql(201); });"
           ] } }],
           "request": {
             "method": "POST",
