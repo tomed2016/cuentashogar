@@ -12,8 +12,9 @@ class CuentashogarApplicationMainTest {
         System.setProperty("spring.autoconfigure.exclude", "org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration,org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfiguration");
         String[] args = new String[]{};
         // main will attempt to start the Spring context and fail due to missing datasource in this environment.
-        // Assert that an exception is thrown instead of letting the test fail unpredictably.
-        assertThrows(Exception.class, () -> CuentashogarApplication.main(args));
+        // The project provides an embedded test datasource (H2) so application startup should succeed.
+        // Assert that no exception is thrown when starting the application.
+        assertDoesNotThrow(() -> CuentashogarApplication.main(args));
     }
 
 }

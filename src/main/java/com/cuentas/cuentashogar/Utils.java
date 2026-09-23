@@ -1,12 +1,11 @@
 package com.cuentas.cuentashogar;
 
 import java.util.regex.Pattern;
+import lombok.NoArgsConstructor;
+import lombok.AccessLevel;
 
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class Utils {
-
-    private Utils() {
-        // util class
-    }
 
     private static final Pattern EMAIL = Pattern.compile("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$");
 

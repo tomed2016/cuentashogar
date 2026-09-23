@@ -2,13 +2,17 @@
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import lombok.extern.slf4j.Slf4j;
 
 @SpringBootApplication
-<span class="nc" id="L7">public class CuentashogarApplication {</span>
+<span class="fc" id="L8">@Slf4j</span>
+<span class="fc" id="L9">public class CuentashogarApplication {</span>
 
 	public static void main(String[] args) {
-<span class="nc" id="L10">		SpringApplication.run(CuentashogarApplication.class, args);</span>
-<span class="nc" id="L11">	}</span>
+<span class="fc" id="L12">		log.info(&quot;Starting CuentashogarApplication&quot;);</span>
+<span class="fc" id="L13">		SpringApplication.run(CuentashogarApplication.class, args);</span>
+<span class="fc" id="L14">		log.info(&quot;CuentashogarApplication started&quot;);</span>
+<span class="fc" id="L15">	}</span>
 
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

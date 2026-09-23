@@ -1,4 +1,4 @@
 GROUP,PACKAGE,CLASS,INSTRUCTION_MISSED,INSTRUCTION_COVERED,BRANCH_MISSED,BRANCH_COVERED,LINE_MISSED,LINE_COVERED,COMPLEXITY_MISSED,COMPLEXITY_COVERED,METHOD_MISSED,METHOD_COVERED
 ,com.cuentas.cuentashogar,Helpers,0,84,0,14,0,18,0,11,0,4
 ,com.cuentas.cuentashogar,Utils,0,31,0,4,0,6,0,6,0,4
-,com.cuentas.cuentashogar,CuentashogarApplication,8,0,0,0,3,0,2,0,2,0
+,com.cuentas.cuentashogar,CuentashogarApplication,0,18,0,0,0,6,0,3,0,3

@@ -1,10 +1,10 @@
 package com.cuentas.cuentashogar;
 
-public final class Helpers {
+import lombok.NoArgsConstructor;
+import lombok.AccessLevel;
 
-    private Helpers() {
-        // utility
-    }
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
+public final class Helpers {
 
     public static boolean isPalindrome(String s) {
         if (s == null) return false;

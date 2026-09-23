@@ -33,3 +33,23 @@ While most of the inheritance is fine, it also inherits unwanted elements like `
 To prevent this, the project POM contains empty overrides for these elements.
 If you manually switch to a different parent and actually want the inheritance, you need to remove those overrides.
 
+
+### Nota sobre errores de DataSource en tests
+
+Si al ejecutar los tests ves un error como:
+
+```
+Failed to configure a DataSource: 'url' attribute is not specified and no embedded datasource could be configured.
+Reason: Failed to determine a suitable driver class
+```
+
+Significa que Spring Boot intentó auto-configurar una fuente de datos (por ejemplo porque `spring-boot-starter-data-jpa` está en las dependencias) pero no encontró ni una URL ni un driver JDBC en el classpath.
+
+Soluciones habituales:
+- Añadir una base de datos embebida para tests (recomendado): añadir `com.h2database:h2` en scope `test` al `pom.xml` permite que Spring cree un DataSource en memoria durante las pruebas.
+- Proveer `spring.datasource.*` en `src/test/resources/application.properties` apuntando a una BD de test.
+- Evitar que los tests carguen el contexto de Spring si no lo necesitan (no usar `@SpringBootTest`).
+- Excluir la auto-configuración de DataSource en tests concretos con `spring.autoconfigure.exclude` o `@EnableAutoConfiguration(exclude = ...)`.
+
+En este repositorio se añadió H2 en scope `test` para que las pruebas unitarias y de contexto se ejecuten sin requerir PostgreSQL.
+

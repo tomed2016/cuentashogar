@@ -1,4 +1,4 @@
 -------------------------------------------------------------------------------
 Test set: com.cuentas.cuentashogar.CuentashogarApplicationMainTest
 -------------------------------------------------------------------------------
-Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 1.216 s -- in com.cuentas.cuentashogar.CuentashogarApplicationMainTest
+Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 2.454 s -- in com.cuentas.cuentashogar.CuentashogarApplicationMainTest
